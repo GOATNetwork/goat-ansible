@@ -1,0 +1,125 @@
+- name: Bootnode setup and run
+  hosts: bootnode_servers
+  become: true
+  gather_facts: false
+  vars:
+    cleanup: false  # default not cleanup
+    bootnode_port: 30301
+    goat_port: 26656
+  tasks:
+    - name: Clean up existing containers
+      when: cleanup
+      ansible.builtin.command: docker rm -f {{ item }}
+      with_items:
+        - geth_bootnode
+
+    - name: Stop and delete Docker containers
+      when: cleanup
+      ansible.builtin.shell: |
+        docker compose -f docker-compose-bootnode.yml down -v
+      args:
+        chdir: /data/runtime/
+      ignore_errors: yes
+
+    - name: Clean up existing directories
+      when: cleanup
+      ansible.builtin.command: rm -rf {{ item }}
+      with_items:
+        - /data/bootnode
+        - /data/runtime
+        - /data/geth
+        - /data/goat
+
+    - name: Create bootnode directory
+      ansible.builtin.file:
+        path: /data/bootnode
+        state: directory
+        mode: '0755'
+
+    - name: Copy bootnode key file
+      ansible.builtin.copy:
+        src: files/bootnode/bootnode.key
+        dest: /data/bootnode/bootnode.key
+        mode: '0644'
+
+    - name: Get bootnode enode URL
+      ansible.builtin.shell: >
+        docker run --rm -v /data/bootnode:/bootnode ethereum/client-go:alltools-latest
+        sh -c "bootnode -nodekey /bootnode/bootnode.key -writeaddress | xargs -I {} echo enode://{}@{{ inventory_hostname }}:{{ bootnode_port }}"
+      register: bootnode_enode
+
+    - name: Run Geth bootnode
+      ansible.builtin.docker_container:
+        name: geth_bootnode
+        image: ethereum/client-go:alltools-latest
+        command: >
+          bootnode
+          -nodekey /bootnode/bootnode.key
+          -addr :{{ bootnode_port }}
+          -verbosity 9
+        volumes:
+          - /data/bootnode:/bootnode
+        ports:
+          - "{{ bootnode_port }}:{{ bootnode_port }}/udp"
+          - "{{ bootnode_port }}:{{ bootnode_port }}/tcp"
+        restart_policy: always
+
+    # Goat setup
+
+    - name: Create target directory
+      ansible.builtin.file:
+        path: "/data/runtime"
+        state: directory
+        mode: '0755'
+
+    - name: Create genesis subdirectory
+      ansible.builtin.file:
+        path: "/data/runtime/genesis"
+        state: directory
+        mode: '0755'
+
+    - name: Copy docker-compose and genesis files
+      changed_when: false
+      ansible.builtin.copy:
+        src: "{{ item.src }}"
+        dest: "/data/runtime/{{ item.path }}"
+        mode: "{{ item.mode }}"
+      with_filetree:
+        - "files/goat/"
+      when: item.state == 'file'
+
+    - name: Init goat
+      ansible.builtin.shell: |
+        docker compose -f docker-compose-init.yml up
+      args:
+        chdir: /data/runtime/
+
+    - name: Copy node_key.json
+      ansible.builtin.copy:
+        src: files/bootnode/node_key.json
+        dest: /data/goat/config/node_key.json
+        mode: '0644'
+
+    - name: Start goat
+      ansible.builtin.shell: |
+        docker compose -f docker-compose-bootnode.yml up -d
+      args:
+        chdir: /data/runtime/
+
+    # - name: Check bootnode status
+    #   ansible.builtin.command: docker ps -f name=geth_bootnode --format '{{"{{"}}.Status{{"}}"}}'
+    #   register: bootnode_status
+    #   changed_when: false
+
+    # - name: Display bootnode status
+    #   ansible.builtin.debug:
+    #     var: bootnode_status.stdout
+
+    # - name: Check Goat seed node status
+    #   ansible.builtin.command: docker ps -f name=goat_seednode --format '{{"{{"}}.Status{{"}}"}}'
+    #   register: goat_status
+    #   changed_when: false
+
+    # - name: Display Goat seed node status
+    #   ansible.builtin.debug:
+    #     var: goat_status.stdout

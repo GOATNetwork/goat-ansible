@@ -1,0 +1,56 @@
+name: devnet
+
+services:
+  geth:
+    image: ghcr.io/goatnetwork/goat-geth:testnet
+    pull_policy: always
+    stop_grace_period: 30s
+    network_mode: host
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "geth attach --exec eth.blockNumber"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    command:
+      - --http
+      - --http.api=eth,net,web3
+      - --http.addr=0.0.0.0
+      - --http.vhosts=*
+      - --http.corsdomain=*
+      - --syncmode=full
+      - --bootnodes=enode://ae8100d3229d42cdced2f0871adfda8851950d768b8a8eb2d4d92a5cacb4b8f36439347c35c39285b5d2216fce493b034452fc187e01288624418bfedf39172f@52.12.249.134:30301
+    volumes:
+      - /data/geth:/root/.ethereum
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "10"
+
+  goat:
+    image: ghcr.io/goatnetwork/goat:testnet
+    pull_policy: always
+    stop_grace_period: 30s
+    network_mode: host
+    restart: unless-stopped
+    command:
+      - --home
+      - /goat
+      - --goat.geth
+      - /geth/geth.ipc
+      - --api.enable
+      - --api.address=tcp://0.0.0.0:1317
+      - --p2p.persistent_peers
+      - c9befb6b8421b46ec5cda76171a8cf7539af20fc@52:26656
+    volumes:
+      - /data/goat:/goat
+      - /data/geth:/geth
+    depends_on:
+      geth:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "10"

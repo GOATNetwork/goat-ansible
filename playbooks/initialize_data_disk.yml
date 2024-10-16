@@ -1,0 +1,64 @@
+---
+- name: Initialize and mount data disk
+  hosts: all
+  become: yes
+  vars:
+    mount_point: /data
+  tasks:
+    - name: Get disk information
+      command: lsblk -bno NAME,SIZE,TYPE
+      register: disk_info
+      changed_when: false
+
+    - name: Identify 500GB data disk
+      set_fact:
+        data_disk: "{{ item.split()[0] }}"
+      when: item.split()[1] == '536870912000' and item.split()[2] == 'disk'
+      loop: "{{ disk_info.stdout_lines }}"
+
+    - name: Display identified data disk
+      debug:
+        var: data_disk
+
+    - name: Check if data disk already has a filesystem
+      command: blkid /dev/{{ data_disk }}
+      register: blkid_output
+      failed_when: false
+      changed_when: false
+
+    - name: Create partition table
+      command: parted /dev/{{ data_disk }} mklabel gpt
+      when: blkid_output.rc != 0
+
+    - name: Create partition
+      command: parted /dev/{{ data_disk }} mkpart primary ext4 0% 100%
+      when: blkid_output.rc != 0
+
+    - name: Create filesystem
+      filesystem:
+        fstype: ext4
+        dev: /dev/{{ data_disk }}
+      when: blkid_output.rc != 0
+
+    - name: Create mount point directory
+      file:
+        path: "{{ mount_point }}"
+        state: directory
+        mode: '0755'
+
+    - name: Mount data disk
+      mount:
+        path: "{{ mount_point }}"
+        src: /dev/{{ data_disk }}
+        fstype: ext4
+        state: mounted
+
+    - name: Add mount point to /etc/fstab
+      mount:
+        path: "{{ mount_point }}"
+        src: /dev/{{ data_disk }}
+        fstype: ext4
+        state: present
+        opts: defaults,nofail
+        dump: 0
+        passno: 2

@@ -1,0 +1,60 @@
+- name: Goat node
+  hosts: rpc_servers,bootnode_servers
+  become: true
+  gather_facts: false
+  vars:
+    cleanup: false  # default not cleanup
+
+  tasks:
+    - name: Clean up Goat environment
+      when: cleanup | bool
+      block:
+        - name: Stop and delete Docker containers
+          ansible.builtin.shell: |
+            docker compose down -v
+          args:
+            chdir: /data/runtime/
+          ignore_errors: yes
+
+        - name: Delete runtime directory
+          ansible.builtin.file:
+            path: "/data/runtime"
+            state: absent
+
+        - name: Delete geth directory
+          ansible.builtin.file:
+            path: "/data/geth"
+            state: absent
+
+        - name: Delete goat directory
+          ansible.builtin.file:
+            path: "/data/goat"
+            state: absent
+
+    - name: Create target directory
+      ansible.builtin.file:
+        path: "/data/runtime"
+        state: directory
+        mode: '0755'
+
+    - name: Create genesis subdirectory
+      ansible.builtin.file:
+        path: "/data/runtime/genesis"
+        state: directory
+        mode: '0755'
+
+    - name: Copy docker-compose and genesis files
+      changed_when: false
+      ansible.builtin.copy:
+        src: "{{ item.src }}"
+        dest: "/data/runtime/{{ item.path }}"
+        mode: "{{ item.mode }}"
+      with_filetree:
+        - "files/goat/"
+      when: item.state == 'file'
+
+    - name: Start goat
+      ansible.builtin.shell: |
+        docker compose pull && docker compose down && docker compose -f docker-compose-init.yml up && docker compose up -d
+      args:
+        chdir: /data/runtime/
