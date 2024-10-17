@@ -1,4 +1,4 @@
-name: devnet-genesis
+name: testnet-genesis
 
 services:
   geth:
@@ -6,7 +6,9 @@ services:
     pull_policy: always
     command:
       - init
-      - --cache.preimages=true
+      # - --cache.preimages=true
+      - --db.engine=pebble
+      - --state.scheme=path
       - /genesis/geth.json
     volumes:
       - /data/geth:/root/.ethereum
@@ -17,7 +19,7 @@ services:
     pull_policy: always
     entrypoint: ["sh", "-c"]
     command:
-      - "goatd init --home /goat devnet && cp /genesis/goat.json /goat/config/genesis.json"
+      - "goatd init --home /goat testnet && cp /genesis/goat.json /goat/config/genesis.json"
     volumes:
       - /data/goat:/goat
       - ./genesis:/genesis

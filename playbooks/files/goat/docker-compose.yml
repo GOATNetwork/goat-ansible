@@ -1,4 +1,4 @@
-name: devnet
+name: testnet
 
 services:
   geth:
