@@ -1,7 +1,7 @@
 {
   "app_name": "goatd",
   "app_version": "testnet-4cee91ed3bc57d4051af723307520c64714b66cc",
-  "genesis_time": "2024-10-16T16:51:00.000000Z",
+  "genesis_time": "2024-10-17T06:37:35.000000Z",
   "chain_id": "goat",
   "initial_height": 1,
   "app_hash": null,

@@ -4,67 +4,90 @@
   gather_facts: false
   vars:
     cleanup: false  # default not cleanup
-    bootnode_port: 30301
-    goat_port: 26656
   tasks:
-    - name: Clean up existing containers
-      when: cleanup
-      ansible.builtin.command: docker rm -f {{ item }}
-      with_items:
-        - geth_bootnode
+    # - name: Clean up existing containers
+    #   when: cleanup
+    #   ansible.builtin.command: docker rm -f {{ item }}
+    #   with_items:
+    #     - geth_bootnode
 
-    - name: Stop and delete Docker containers
-      when: cleanup
-      ansible.builtin.shell: |
-        docker compose -f docker-compose-bootnode.yml down -v
-      args:
-        chdir: /data/runtime/
-      ignore_errors: yes
+    # - name: Stop and delete Docker containers
+    #   when: cleanup
+    #   ansible.builtin.shell: |
+    #     docker compose -f docker-compose-bootnode.yml down -v
+    #   args:
+    #     chdir: /data/runtime/
+    #   ignore_errors: yes
 
-    - name: Clean up existing directories
-      when: cleanup
-      ansible.builtin.command: rm -rf {{ item }}
-      with_items:
-        - /data/bootnode
-        - /data/runtime
-        - /data/geth
-        - /data/goat
+    # - name: Clean up existing directories
+    #   when: cleanup
+    #   ansible.builtin.command: rm -rf {{ item }}
+    #   with_items:
+    #     - /data/bootnode
+    #     - /data/runtime
+    #     - /data/geth
+    #     - /data/goat
 
-    - name: Create bootnode directory
-      ansible.builtin.file:
-        path: /data/bootnode
-        state: directory
-        mode: '0755'
+    # - name: Create bootnode directory
+    #   ansible.builtin.file:
+    #     path: /data/bootnode
+    #     state: directory
+    #     mode: '0755'
 
-    - name: Copy bootnode key file
-      ansible.builtin.copy:
-        src: files/bootnode/bootnode.key
-        dest: /data/bootnode/bootnode.key
-        mode: '0644'
+    # - name: Copy bootnode key file
+    #   ansible.builtin.copy:
+    #     src: files/bootnode/bootnode.key
+    #     dest: /data/bootnode/bootnode.key
+    #     mode: '0644'
 
-    - name: Get bootnode enode URL
-      ansible.builtin.shell: >
-        docker run --rm -v /data/bootnode:/bootnode ethereum/client-go:alltools-latest
-        sh -c "bootnode -nodekey /bootnode/bootnode.key -writeaddress | xargs -I {} echo enode://{}@{{ inventory_hostname }}:{{ bootnode_port }}"
-      register: bootnode_enode
+    # - name: Get bootnode enode URL
+    #   ansible.builtin.shell: >
+    #     docker run --rm -v /data/bootnode:/bootnode ethereum/client-go:alltools-latest
+    #     sh -c "bootnode -nodekey /bootnode/bootnode.key -writeaddress | xargs -I {} echo enode://{}@{{ inventory_hostname }}:{{ bootnode_port }}"
+    #   register: bootnode_enode
 
-    - name: Run Geth bootnode
-      ansible.builtin.docker_container:
-        name: geth_bootnode
-        image: ethereum/client-go:alltools-latest
-        command: >
-          bootnode
-          -nodekey /bootnode/bootnode.key
-          -addr :{{ bootnode_port }}
-          -verbosity 9
-        volumes:
-          - /data/bootnode:/bootnode
-        ports:
-          - "{{ bootnode_port }}:{{ bootnode_port }}/udp"
-          - "{{ bootnode_port }}:{{ bootnode_port }}/tcp"
-        restart_policy: always
+    # - name: Run Geth bootnode
+    #   ansible.builtin.docker_container:
+    #     name: geth_bootnode
+    #     image: ethereum/client-go:alltools-latest
+    #     command: >
+    #       bootnode
+    #       -nodekey /bootnode/bootnode.key
+    #       -addr :{{ bootnode_port }}
+    #       -nat extip:{{ inventory_hostname }}
+    #       -verbosity 9
+    #     volumes:
+    #       - /data/bootnode:/bootnode
+    #     ports:
+    #       - "{{ bootnode_port }}:{{ bootnode_port }}/udp"
+    #       - "{{ bootnode_port }}:{{ bootnode_port }}/tcp"
+    #     restart_policy: always
 
-    # Goat setup
+    # # Goat setup
+    - name: Clean up Goat environment
+      when: cleanup | bool
+      block:
+        - name: Stop and delete Docker containers
+          ansible.builtin.shell: |
+            docker compose down -v
+          args:
+            chdir: /data/runtime/
+          ignore_errors: yes
+
+        - name: Delete runtime directory
+          ansible.builtin.file:
+            path: "/data/runtime"
+            state: absent
+
+        - name: Delete geth directory
+          ansible.builtin.file:
+            path: "/data/geth"
+            state: absent
+
+        - name: Delete goat directory
+          ansible.builtin.file:
+            path: "/data/goat"
+            state: absent
 
     - name: Create target directory
       ansible.builtin.file:
@@ -93,6 +116,12 @@
         docker compose -f docker-compose-init.yml up
       args:
         chdir: /data/runtime/
+
+    - name: Copy bootnode.key
+      ansible.builtin.copy:
+        src: files/bootnode/bootnode.key
+        dest: /data/geth/geth/nodekey
+        mode: '0644'
 
     - name: Copy node_key.json
       ansible.builtin.copy:

@@ -19,7 +19,8 @@ services:
       - --http.vhosts=*
       - --http.corsdomain=*
       - --syncmode=full
-      - --bootnodes=enode://ae8100d3229d42cdced2f0871adfda8851950d768b8a8eb2d4d92a5cacb4b8f36439347c35c39285b5d2216fce493b034452fc187e01288624418bfedf39172f@52.12.249.134:30301
+      - --bootnodes=enode://0d41d098846751f0f90ea66e4d7e6741591e9c4bfb6e75d14f78ca3702415fb795adad64b2805f428c86f6ae2ee5315322301e02c63c917f92756a909679599e@52.12.249.134:30303
+      - --log.debug
     volumes:
       - /data/geth:/root/.ethereum
     logging:
@@ -42,7 +43,8 @@ services:
       - --api.enable
       - --api.address=tcp://0.0.0.0:1317
       - --p2p.persistent_peers
-      - c9befb6b8421b46ec5cda76171a8cf7539af20fc@52:26656
+      - c9befb6b8421b46ec5cda76171a8cf7539af20fc@52.12.249.134:26656
+      - --log_level=debug
     volumes:
       - /data/goat:/goat
       - /data/geth:/geth

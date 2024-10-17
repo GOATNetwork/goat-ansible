@@ -19,6 +19,7 @@ services:
       - --http.vhosts=*
       - --http.corsdomain=*
       - --syncmode=full
+      - --log.debug
     volumes:
       - /data/geth:/root/.ethereum
     logging:
@@ -40,7 +41,7 @@ services:
       - /geth/geth.ipc
       - --api.enable
       - --api.address=tcp://0.0.0.0:1317
-      - --p2p.seed_mode
+      - --log_level=debug
     volumes:
       - /data/goat:/goat
       - /data/geth:/geth
