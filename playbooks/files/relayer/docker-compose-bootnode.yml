@@ -1,0 +1,14 @@
+name: testnet
+
+services:
+  goat-relayer:
+    build: .
+    image: goatnetwork/goat-relayer:latest
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+      - "50051:50051"
+      - "4001:4001"
+    volumes:
+      - /data/db:/app/db
