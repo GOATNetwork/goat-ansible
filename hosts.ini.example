@@ -1,15 +1,18 @@
+# fireblocks nodes
 [fb_servers]
 10.0.0.40
 
 [nitro_servers]
 10.0.0.30
 
+# relayer nodes
 [relayer_servers]
 10.0.0.20
 10.0.0.21
 10.0.0.22
 
-[rpc_servers]
+# goat nodes
+[validator_servers]
 10.0.0.11
 10.0.0.12
 10.0.0.13

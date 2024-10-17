@@ -4,6 +4,8 @@
   gather_facts: false
   vars:
     cleanup: false  # default not cleanup
+    geth_nodekey_file: files/goat/bootnode/bootnode.key
+    goat_nodekey_file: files/goat/bootnode/node_key.json
   tasks:
     # # Goat setup
     - name: Clean up Goat environment
@@ -61,13 +63,13 @@
 
     - name: Copy bootnode.key
       ansible.builtin.copy:
-        src: files/bootnode/bootnode.key
+        src: "{{ geth_nodekey_file }}"
         dest: /data/geth/geth/nodekey
         mode: '0644'
 
     - name: Copy node_key.json
       ansible.builtin.copy:
-        src: files/bootnode/node_key.json
+        src: "{{ goat_nodekey_file }}"
         dest: /data/goat/config/node_key.json
         mode: '0644'
 
