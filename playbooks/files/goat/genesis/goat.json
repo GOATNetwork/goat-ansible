@@ -1,8 +1,8 @@
 {
   "app_name": "goatd",
-  "app_version": "testnet-4cee91ed3bc57d4051af723307520c64714b66cc",
-  "genesis_time": "2024-10-17T06:37:35.000000Z",
-  "chain_id": "goat",
+  "app_version": "testnet-ad223b396d101427a3c6af395a2e68adc6fea91f",
+  "genesis_time": "2024-10-17T07:50:30.814372Z",
+  "chain_id": "goat-testnet-1",
   "initial_height": 1,
   "app_hash": null,
   "app_state": {
@@ -94,13 +94,11 @@
         "min_deposit_amount": "10000",
         "deposit_magic_prefix": "R1RWMQ=="
       },
-      "block_tip": "3127833",
-      "block_hashes": [
-        "teKkcCTtmbyJU6ly227sENNtw467Q7gHfwAAAAAAAAA="
-      ],
+      "block_tip": "3191651",
+      "block_hashes": ["Cl5ITwtpp8o2Yq22em+dS08kFNtKWFThV7G8DgAAAAA="],
       "eth_tx_nonce": "0",
       "eth_tx_queue": {
-        "block_number": "3127833",
+        "block_number": "3191651",
         "deposits": [],
         "paid_withdrawals": [],
         "rejected_withdrawals": []
@@ -108,7 +106,28 @@
       "pubkey": {
         "secp256k1": "AozQg32UFD6xlP1iXsDtq23r/KGPfwWflxh9F5Vf79Gw"
       },
-      "deposits": [],
+      "deposits": [
+        {
+          "txid": "LhF6QB9Z0EzQkToexpY0iRpb8Sbsp5XTwNihjSzOgLM=",
+          "txout": 0,
+          "amount": "1000000000"
+        },
+        {
+          "txid": "OtaeLwhok3wpLVE/sQKFKwbmaBEM/IIXbhYSHmmcW1I=",
+          "txout": 0,
+          "amount": "1000000000"
+        },
+        {
+          "txid": "SvrWiKXwJQ4dncq/QEmMZbs9202aZD5FH8YEVegq+ZU=",
+          "txout": 0,
+          "amount": "1000000000"
+        },
+        {
+          "txid": "M+dSA0XuQ8KQ1bOTDimd5Jxn2OXoJMonJeugY+f2Vpc=",
+          "txout": 0,
+          "amount": "1000000000"
+        }
+      ],
       "withdrawals": []
     },
     "consensus": null,
@@ -117,17 +136,17 @@
       "eth_block": {
         "parent_hash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
         "fee_recipient": "AAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-        "state_root": "1UqgkxQKkDJNuZRW3dQHVrRxePYpveyOlrQiynv+ymQ=",
+        "state_root": "8K11Q5yepZEexyKGIX88U/5JJbD6OwmbePCDHjZvF0k=",
         "receipts_root": "VugfFxvMVab/g0XmksD4bltI4BuZbK3AAWIvteNjtCE=",
         "logs_bloom": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
         "prev_randao": "AQ==",
         "block_number": "0",
         "gas_limit": "30000000",
         "gas_used": "0",
-        "timestamp": "1728980655",
+        "timestamp": "1729148722",
         "extra_data": "AFboHxcbzFWm/4NF5pLA+G5bSOAbmWytwAFiL7XjY7Qh",
         "base_fee_per_gas": "500000000",
-        "block_hash": "T9YUd8OH485S5FnoM5NrC5D953142iYc1XU4OOE87LI=",
+        "block_hash": "BKDX5aoWEvPzv+ayvu8rTl33mKcRUodvOXB5SQcg3jQ=",
         "transactions": [],
         "beacon_root": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
         "blob_gas_used": "0",
@@ -138,8 +157,8 @@
     },
     "locking": {
       "params": {
-        "unlock_duration": "604800s",
-        "exiting_duration": "1814400s",
+        "unlock_duration": "1800s",
+        "exiting_duration": "3600s",
         "downtime_jail_duration": "10800s",
         "max_validators": "20",
         "signed_blocks_window": "1200",
@@ -248,7 +267,7 @@
       "reward_pool": {
         "goat": "0",
         "gas": "0",
-        "remain": "0"
+        "remain": "200000000000000000000000000"
       },
       "unlock_queue": []
     },
@@ -264,7 +283,7 @@
           "goat1ea4x6tcke5xwrdm2uxs8huxnvs4a6n5yty0g25",
           "goat1zstgatvg78ca2f7erqt0y7vc557z7qkw2eld6d"
         ],
-        "last_elected": "2024-10-15T09:41:02.133061Z",
+        "last_elected": "2024-10-17T07:07:31.152110Z",
         "proposer_accepted": true
       },
       "sequence": "0",
@@ -309,9 +328,7 @@
         "max_bytes": "1048576"
       },
       "validator": {
-        "pub_key_types": [
-          "secp256k1"
-        ]
+        "pub_key_types": ["secp256k1"]
       },
       "version": {
         "app": "0"
