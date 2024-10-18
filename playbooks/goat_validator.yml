@@ -1,5 +1,5 @@
 - name: Validator setup and run
-  hosts: rpc_servers
+  hosts: goat_validator_servers
   become: true
   gather_facts: false
   vars:

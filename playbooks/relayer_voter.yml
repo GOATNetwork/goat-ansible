@@ -1,5 +1,5 @@
-- name: Bootnode setup and run
-  hosts: bootnode_servers
+- name: Voter setup and run
+  hosts: relayer_voter_servers
   become: true
   gather_facts: false
   vars:

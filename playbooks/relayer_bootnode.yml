@@ -1,5 +1,5 @@
 - name: Bootnode setup and run
-  hosts: bootnode_servers
+  hosts: relayer_bootnode_servers
   become: true
   gather_facts: false
   vars:
