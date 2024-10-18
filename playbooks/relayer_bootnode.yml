@@ -3,10 +3,14 @@
   become: true
   gather_facts: false
   vars:
-    cleanup: false  # default not cleanup
+    cleanup: false # default not cleanup
+    voter_env_files:
+      - "secrets/relayer/bootnode/voter_a.env"
+    relayer_nodekey_files: 
+      - "secrets/relayer/bootnode/node_private_key.pem"
   tasks:
-    # # Goat setup
-    - name: Clean up Goat environment
+    # Relayer setup
+    - name: Clean up Relayer environment
       when: cleanup | bool
       block:
         - name: Stop and delete Docker containers
@@ -21,14 +25,9 @@
             path: "/data/runtime"
             state: absent
 
-        - name: Delete geth directory
+        - name: Delete db directory
           ansible.builtin.file:
-            path: "/data/geth"
-            state: absent
-
-        - name: Delete goat directory
-          ansible.builtin.file:
-            path: "/data/goat"
+            path: "/data/db"
             state: absent
 
     - name: Create target directory
@@ -37,24 +36,38 @@
         state: directory
         mode: '0755'
 
-    - name: Create genesis subdirectory
-      ansible.builtin.file:
-        path: "/data/runtime/genesis"
-        state: directory
-        mode: '0755'
-
-    - name: Copy docker-compose and genesis files
+    - name: Copy docker-compose files
       changed_when: false
       ansible.builtin.copy:
         src: "{{ item.src }}"
         dest: "/data/runtime/{{ item.path }}"
         mode: "{{ item.mode }}"
       with_filetree:
-        - "files/goat/"
+        - "files/relayer/"
       when: item.state == 'file'
 
-    - name: Start goat
+    - name: Copy bootnode nodekey file
+      ansible.builtin.copy:
+        src: "{{ relayer_nodekey_file }}"
+        dest: /data/db/node_private_key.pem
+        mode: '0644'
+      loop: "{{ relayer_nodekey_files }}"
+      loop_control:
+        index_var: idx
+      when: idx == ansible_play_hosts.index(inventory_hostname)
+      
+    - name: Copy voter env files
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "/data/runtime/.env"
+        mode: '0644'
+      loop: "{{ voter_env_files }}"
+      loop_control:
+        index_var: idx
+      when: idx == ansible_play_hosts.index(inventory_hostname)
+
+    - name: Start relayer
       ansible.builtin.shell: |
-        docker compose up -d
+        docker compose up -f docker-compose-bootnode.yml -d
       args:
         chdir: /data/runtime/

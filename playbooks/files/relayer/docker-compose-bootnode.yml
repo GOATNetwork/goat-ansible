@@ -2,7 +2,6 @@ name: testnet
 
 services:
   goat-relayer:
-    build: .
     image: goatnetwork/goat-relayer:latest
     env_file:
       - .env
