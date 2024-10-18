@@ -7,7 +7,7 @@
     geth_nodekey_file: secrets/goat/bootnode/geth_nodekey.key
     goat_nodekey_file: secrets/goat/bootnode/goat_nodekey.json
   tasks:
-    # # Goat setup
+    # Goat setup
     - name: Clean up Goat environment
       when: cleanup | bool
       block:
@@ -55,25 +55,25 @@
         - "files/goat/"
       when: item.state == 'file'
 
-    - name: Init goat
+    - name: Init Goat CL & EL
       ansible.builtin.shell: |
         docker compose -f docker-compose-init.yml up
       args:
         chdir: /data/runtime/
 
-    - name: Copy bootnode.key
+    - name: Copy Geth nodekey file
       ansible.builtin.copy:
         src: "{{ geth_nodekey_file }}"
         dest: /data/geth/geth/nodekey
         mode: '0644'
 
-    - name: Copy node_key.json
+    - name: Copy Goat nodekey file
       ansible.builtin.copy:
         src: "{{ goat_nodekey_file }}"
         dest: /data/goat/config/node_key.json
         mode: '0644'
 
-    - name: Start goat
+    - name: Start Goat CL & EL
       ansible.builtin.shell: |
         docker compose -f docker-compose-bootnode.yml up -d
       args:
