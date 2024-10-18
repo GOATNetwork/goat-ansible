@@ -29,9 +29,15 @@
             path: "/data/db"
             state: absent
 
-    - name: Create target directory
+    - name: Create runtime directory
       ansible.builtin.file:
         path: "/data/runtime"
+        state: directory
+        mode: '0755'
+
+    - name: Create db directory
+      ansible.builtin.file:
+        path: "/data/db"
         state: directory
         mode: '0755'
 
@@ -57,6 +63,6 @@
 
     - name: Start relayer
       ansible.builtin.shell: |
-        docker compose up -f docker-compose-bootnode.yml -d
+        docker compose up -d
       args:
         chdir: /data/runtime/

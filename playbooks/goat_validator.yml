@@ -9,6 +9,7 @@
       - "secrets/goat/validator/priv_validator_key_2.json"
       - "secrets/goat/validator/priv_validator_key_3.json"
   tasks:
+    # Goat setup
     - name: Clean up Goat environment
       when: cleanup | bool
       block:
@@ -56,13 +57,13 @@
         - "files/goat/"
       when: item.state == 'file'
 
-    - name: Init goat
+    - name: Init Goat CL & EL
       ansible.builtin.shell: |
         docker compose -f docker-compose-init.yml up
       args:
         chdir: /data/runtime/
 
-    - name: Copy validator files
+    - name: Copy Goat validator key files
       ansible.builtin.copy:
         src: "{{ item }}"
         dest: "/data/goat/config/priv_validator_key.json"
@@ -72,7 +73,7 @@
         index_var: idx
       when: idx == ansible_play_hosts.index(inventory_hostname)
 
-    - name: Start goat
+    - name: Start Goat CL & EL
       ansible.builtin.shell: |
         docker compose up -d
       args:

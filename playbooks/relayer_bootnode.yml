@@ -30,9 +30,15 @@
             path: "/data/db"
             state: absent
 
-    - name: Create target directory
+    - name: Create runtime directory
       ansible.builtin.file:
         path: "/data/runtime"
+        state: directory
+        mode: '0755'
+
+    - name: Create db directory
+      ansible.builtin.file:
+        path: "/data/db"
         state: directory
         mode: '0755'
 
@@ -46,9 +52,9 @@
         - "files/relayer/"
       when: item.state == 'file'
 
-    - name: Copy bootnode nodekey file
+    - name: Copy bootnode nodekey files
       ansible.builtin.copy:
-        src: "{{ relayer_nodekey_file }}"
+        src: "{{ item }}"
         dest: /data/db/node_private_key.pem
         mode: '0644'
       loop: "{{ relayer_nodekey_files }}"
@@ -68,6 +74,6 @@
 
     - name: Start relayer
       ansible.builtin.shell: |
-        docker compose up -f docker-compose-bootnode.yml -d
+        docker compose -f docker-compose-bootnode.yml up -d
       args:
         chdir: /data/runtime/
