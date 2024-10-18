@@ -5,9 +5,9 @@
   vars:
     cleanup: false  # default not cleanup
     validator_files: # length should equal to the number of validators
-      - "files/goat/validator/priv_validator_key_1.json"
-      - "files/goat/validator/priv_validator_key_2.json"
-      - "files/goat/validator/priv_validator_key_3.json"
+      - "secrets/goat/validator/priv_validator_key_1.json"
+      - "secrets/goat/validator/priv_validator_key_2.json"
+      - "secrets/goat/validator/priv_validator_key_3.json"
   tasks:
     - name: Clean up Goat environment
       when: cleanup | bool

@@ -4,8 +4,8 @@
   gather_facts: false
   vars:
     cleanup: false  # default not cleanup
-    geth_nodekey_file: files/goat/bootnode/bootnode.key
-    goat_nodekey_file: files/goat/bootnode/node_key.json
+    geth_nodekey_file: secrets/goat/bootnode/geth_nodekey.key
+    goat_nodekey_file: secrets/goat/bootnode/goat_nodekey.json
   tasks:
     # # Goat setup
     - name: Clean up Goat environment
