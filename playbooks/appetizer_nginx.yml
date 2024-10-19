@@ -1,0 +1,43 @@
+- name: Install NGINX
+  hosts: all
+  become: true
+  vars:
+    internal_dnsname: "{{ hostvars[inventory_hostname]['internal_dnsname'] }}"
+    nginx_proxy_conf: "secrets/appetizer/nginx_proxy.conf.j2"
+  tasks:
+    - name: Install NGINX
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: Configure NGINX reverse proxy
+      template:
+        src: "{{ nginx_proxy_conf }}"
+        dest: /etc/nginx/sites-available/reverse_proxy
+      notify:
+        - Restart NGINX
+
+    - name: Replace internal.dns.name
+      ansible.builtin.shell:
+        cmd: "sed -i 's/internal\\.dns\\.name/{{ internal_dnsname }}/g' /etc/nginx/sites-available/reverse_proxy"
+      notify:
+        - Restart NGINX
+
+    - name: Remove default configuration file
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Create symbolic link to enable reverse proxy configuration
+      file:
+        src: /etc/nginx/sites-available/reverse_proxy
+        dest: /etc/nginx/sites-enabled/reverse_proxy
+        state: link
+
+  handlers:
+    - name: Restart NGINX
+      service:
+        name: nginx
+        state: restarted

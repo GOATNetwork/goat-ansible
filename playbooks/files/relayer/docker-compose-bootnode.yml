@@ -3,8 +3,13 @@ name: testnet
 services:
   goat-relayer:
     image: goatnetwork/goat-relayer:latest
+    pull_policy: always
     env_file:
       - .env
+    environment:
+      - L2_RPC=http://ip-10-1-103-28.us-west-2.compute.internal:8545
+      - GOATCHAIN_RPC_URI=tcp://ip-10-1-103-28.us-west-2.compute.internal:26657
+      - GOATCHAIN_GRPC_URI=ip-10-1-103-28.us-west-2.compute.internal:9090
     ports:
       - "8080:8080"
       - "50051:50051"

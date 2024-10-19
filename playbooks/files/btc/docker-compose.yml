@@ -1,0 +1,21 @@
+name: bitcoin-testnet3
+
+services:
+  bitcoin-node:
+    image: kylemanna/bitcoind
+    container_name: bitcoin-testnet-node
+    volumes:
+      - /data/bitcoin:/bitcoin/.bitcoin
+    ports:
+      - "18332:18332"
+      - "18333:18333"
+    command:
+      -datadir=/bitcoin/.bitcoin
+      -server=1
+      -txindex=1
+      -testnet=1
+      -rpcbind=0.0.0.0
+      -rpcallowip=0.0.0.0/0
+      -rpcuser=goat
+      -rpcpassword=goat
+    restart: unless-stopped

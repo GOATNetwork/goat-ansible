@@ -1,4 +1,4 @@
-- name: Install tools
+- name: Install Docker
   hosts: all
   become: true
   gather_facts: false

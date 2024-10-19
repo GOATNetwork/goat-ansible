@@ -1,0 +1,50 @@
+---
+- name: Extend the first partition of all disks
+  hosts: all
+  become: yes
+  tasks:
+    - name: Get all disk information
+      ansible.builtin.shell: lsblk -ndo NAME,TYPE | awk '$2=="disk" {print $1}'
+      register: disks
+      changed_when: false
+
+    - name: Get the first partition information for each disk
+      ansible.builtin.shell: lsblk -nlo NAME,TYPE /dev/{{ item }} | awk '$2=="part" {print $1}' | head -n1
+      register: partitions
+      loop: "{{ disks.stdout_lines }}"
+      changed_when: false
+
+    - name: Extend the first partition of each disk
+      ansible.builtin.shell: |
+        if [ -n "{{ partitions.results[idx].stdout }}" ]; then
+          growpart /dev/{{ item }} 1
+          partprobe /dev/{{ item }}
+          resize2fs /dev/{{ partitions.results[idx].stdout }}
+        else
+          echo "No partition found for /dev/{{ item }}"
+        fi
+      loop: "{{ disks.stdout_lines }}"
+      loop_control:
+        index_var: idx
+      ignore_errors: yes
+
+    - name: Check and repair file system errors
+      ansible.builtin.shell: |
+        if [ -n "{{ partitions.results[idx].stdout }}" ]; then
+          e2fsck -f -y /dev/{{ partitions.results[idx].stdout }}
+        else
+          echo "No partition found for /dev/{{ item }}"
+        fi
+      loop: "{{ disks.stdout_lines }}"
+      loop_control:
+        index_var: idx
+      ignore_errors: yes
+
+    - name: Display updated disk information
+      ansible.builtin.shell: df -h
+      register: disk_info
+      changed_when: false
+
+    - name: Output disk information
+      ansible.builtin.debug:
+        var: disk_info.stdout_lines

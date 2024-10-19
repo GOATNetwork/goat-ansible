@@ -58,6 +58,7 @@
       when: item.state == 'file'
 
     - name: Init Goat CL & EL
+      when: cleanup | bool
       ansible.builtin.shell: |
         docker compose -f docker-compose-init.yml up
       args:

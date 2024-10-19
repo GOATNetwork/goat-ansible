@@ -1,0 +1,49 @@
+- name: BTC setup and run
+  hosts: btc_servers
+  become: true
+  gather_facts: false
+  vars:
+    cleanup: false # default not cleanup
+  tasks:
+    # BTC setup
+    - name: Clean up BTC environment
+      when: cleanup | bool
+      block:
+        - name: Stop and delete Docker containers
+          ansible.builtin.shell: |
+            docker compose down -v
+          args:
+            chdir: /data/runtime/
+          ignore_errors: yes
+
+        - name: Delete runtime directory
+          ansible.builtin.file:
+            path: "/data/runtime"
+            state: absent
+
+        - name: Delete bitcoin directory
+          ansible.builtin.file:
+            path: "/data/bitcoin"
+            state: absent
+
+    - name: Create runtime directory
+      ansible.builtin.file:
+        path: "/data/runtime"
+        state: directory
+        mode: '0755'
+
+    - name: Copy docker-compose files
+      changed_when: false
+      ansible.builtin.copy:
+        src: "{{ item.src }}"
+        dest: "/data/runtime/{{ item.path }}"
+        mode: "{{ item.mode }}"
+      with_filetree:
+        - "files/btc/"
+      when: item.state == 'file'
+
+    - name: Start bitcoin
+      ansible.builtin.shell: |
+        docker compose up -d
+      args:
+        chdir: /data/runtime/
