@@ -6,6 +6,8 @@
     cleanup: false # default not cleanup
     geth_nodekey_file: secrets/goat/bootnode/geth_nodekey.key
     goat_nodekey_file: secrets/goat/bootnode/goat_nodekey.json
+    validator_files: # length should equal to the number of validators
+      - "secrets/goat/bootnode/priv_validator_key_0.json"
   tasks:
     # Goat setup
     - name: Clean up Goat environment
@@ -74,8 +76,18 @@
         dest: /data/goat/config/node_key.json
         mode: '0644'
 
+    - name: Copy Goat validator key files
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "/data/goat/config/priv_validator_key.json"
+        mode: '0644'
+      loop: "{{ validator_files }}"
+      loop_control:
+        index_var: idx
+      when: idx == ansible_play_hosts.index(inventory_hostname)
+
     - name: Start Goat CL & EL
       ansible.builtin.shell: |
-        docker compose -f docker-compose-bootnode.yml up -d --force-recreate
+        docker compose up -d --force-recreate
       args:
         chdir: /data/runtime/

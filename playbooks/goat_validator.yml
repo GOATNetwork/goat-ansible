@@ -8,6 +8,7 @@
       - "secrets/goat/validator/priv_validator_key_1.json"
       - "secrets/goat/validator/priv_validator_key_2.json"
       - "secrets/goat/validator/priv_validator_key_3.json"
+      - "secrets/goat/validator/priv_validator_key_4.json"
   tasks:
     # Goat setup
     - name: Clean up Goat environment
