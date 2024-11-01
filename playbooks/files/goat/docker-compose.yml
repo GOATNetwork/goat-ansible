@@ -41,6 +41,8 @@ services:
       - /geth/geth.ipc
       - --api.enable
       - --api.address=tcp://0.0.0.0:1317
+      - --rpc.laddr=tcp://0.0.0.0:26657
+      - --grpc.address=0.0.0.0:9090
       - --p2p.persistent_peers
       - c9befb6b8421b46ec5cda76171a8cf7539af20fc@52.12.249.134:26656
     volumes:
