@@ -1,0 +1,13 @@
+name: bridge-api-testnet
+
+services:
+  bridge-api-node:
+    image: goatnetwork/bridge-api-testnet:0.2.58
+    container_name: bridge-api-testnet-node
+    volumes:
+      - /data/app/logs:/app/logs
+    ports:
+      - "3000:3000"
+    environment:
+      LOG_PATH: /app/logs
+    restart: unless-stopped
