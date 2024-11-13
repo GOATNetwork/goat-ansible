@@ -7,10 +7,7 @@ services:
     env_file:
       - .env
     environment:
-      - L2_RPC=http://ip-10-1-103-28.us-west-2.compute.internal:8545
-      - GOATCHAIN_RPC_URI=tcp://ip-10-1-103-28.us-west-2.compute.internal:26657
-      - GOATCHAIN_GRPC_URI=ip-10-1-103-28.us-west-2.compute.internal:9090
-      - LIBP2P_BOOT_NODES=/ip4/10.1.103.223/tcp/4001/p2p/12D3KooWEyrTn9ZD2Kidma4EKZ7ajaa7XDdje822WNZBRxpwQBYx
+      - LIBP2P_BOOT_NODES=/ip4/10.0.1.194/tcp/4001/p2p/12D3KooWEyrTn9ZD2Kidma4EKZ7ajaa7XDdje822WNZBRxpwQBYx
     ports:
       - "8080:8080"
       - "50051:50051"
