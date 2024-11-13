@@ -67,7 +67,7 @@
       ansible.builtin.copy:
         src: "{{ item }}"
         dest: "/data/goat/config/priv_validator_key.json"
-        mode: '0644'
+        mode: '0600'
       loop: "{{ validator_files }}"
       loop_control:
         index_var: idx
