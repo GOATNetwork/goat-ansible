@@ -41,13 +41,7 @@
         state: directory
         mode: '0755'
 
-    - name: Create genesis subdirectory
-      ansible.builtin.file:
-        path: "/data/runtime/genesis"
-        state: directory
-        mode: '0755'
-
-    - name: Copy docker-compose and genesis files
+    - name: Copy docker-compose files
       changed_when: false
       ansible.builtin.copy:
         src: "{{ item.src }}"
@@ -56,13 +50,6 @@
       with_filetree:
         - "files/goat/"
       when: item.state == 'file'
-
-    - name: Init Goat CL & EL
-      when: cleanup | bool
-      ansible.builtin.shell: |
-        docker compose -f docker-compose-init.yml up
-      args:
-        chdir: /data/runtime/
 
     - name: Copy Geth nodekey file
       ansible.builtin.copy:

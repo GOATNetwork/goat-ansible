@@ -1,58 +1,41 @@
-name: testnet
+name: testnet3
 
 services:
   geth:
-    image: ghcr.io/goatnetwork/goat-geth:testnet
-    pull_policy: always
-    stop_grace_period: 30s
+    image: ghcr.io/goatnetwork/goat-geth:v0.1.0
     network_mode: host
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "geth attach --exec eth.blockNumber"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+    stop_grace_period: 30s
     command:
-      - --http
-      - --http.api=eth,net,web3
-      - --http.addr=0.0.0.0
-      - --http.vhosts=*
-      - --http.corsdomain=*
-      - --syncmode=full
-      - --bootnodes=enode://0d41d098846751f0f90ea66e4d7e6741591e9c4bfb6e75d14f78ca3702415fb795adad64b2805f428c86f6ae2ee5315322301e02c63c917f92756a909679599e@52.12.249.134:30303
+      - --goat=testnet3
+      - --goat.preset=bootnode,rpc
+      # open it if you need an archive node
+      # - --gcmode=archive
     volumes:
       - /data/geth:/root/.ethereum
     logging:
       driver: json-file
       options:
-        max-size: "50m"
         max-file: "10"
+        max-size: 50m
 
   goat:
-    image: ghcr.io/goatnetwork/goat:testnet
-    pull_policy: always
-    stop_grace_period: 30s
+    image: ghcr.io/goatnetwork/goat:v0.1.0
     network_mode: host
     restart: unless-stopped
+    stop_grace_period: 30s
     command:
-      - --home
-      - /goat
-      - --goat.geth
-      - /geth/geth.ipc
-      - --api.enable
-      - --api.address=tcp://0.0.0.0:1317
-      - --rpc.laddr=tcp://0.0.0.0:26657
-      - --grpc.address=0.0.0.0:9090
-      - --p2p.persistent_peers
-      - c9befb6b8421b46ec5cda76171a8cf7539af20fc@52.12.249.134:26656
-    volumes:
-      - /data/goat:/goat
-      - /data/geth:/geth
+      - start
+      - --goat.geth=/geth/geth.ipc
+      - --goat.preset=bootnode,rpc
+      - --chain-id=goat-testnet3
     depends_on:
-      geth:
-        condition: service_healthy
+      - geth
+    volumes:
+      - /data/goat:/root/.goat
+      - /data/geth:/geth
     logging:
       driver: json-file
       options:
-        max-size: "50m"
         max-file: "10"
+        max-size: 50m
