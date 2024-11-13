@@ -41,6 +41,24 @@
         state: directory
         mode: '0755'
 
+    - name: Create target directory
+      ansible.builtin.file:
+        path: "/data/goat"
+        state: directory
+        mode: '0755'
+
+    - name: Create target directory
+      ansible.builtin.file:
+        path: "/data/geth"
+        state: directory
+        mode: '0755'
+
+    - name: Create target directory
+      ansible.builtin.file:
+        path: "/data/geth/geth"
+        state: directory
+        mode: '0755'
+
     - name: Copy docker-compose files
       changed_when: false
       ansible.builtin.copy:
@@ -55,13 +73,13 @@
       ansible.builtin.copy:
         src: "{{ geth_nodekey_file }}"
         dest: /data/geth/geth/nodekey
-        mode: '0644'
+        mode: '0600'
 
     - name: Copy Goat nodekey file
       ansible.builtin.copy:
         src: "{{ goat_nodekey_file }}"
         dest: /data/goat/config/node_key.json
-        mode: '0644'
+        mode: '0600'
 
     - name: Copy Goat validator key files
       ansible.builtin.copy:
