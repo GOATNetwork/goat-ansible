@@ -20,7 +20,7 @@ services:
         max-size: 50m
 
   goat:
-    image: ghcr.io/goatnetwork/goat:v0.1.0
+    image: ghcr.io/goatnetwork/goat:v0.1.1
     network_mode: host
     restart: unless-stopped
     stop_grace_period: 30s
