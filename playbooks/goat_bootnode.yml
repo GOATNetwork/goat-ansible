@@ -43,6 +43,12 @@
 
     - name: Create target directory
       ansible.builtin.file:
+        path: "/data/goat/config"
+        state: directory
+        mode: '0755'
+
+    - name: Create target directory
+      ansible.builtin.file:
         path: "/data/goat"
         state: directory
         mode: '0755'
